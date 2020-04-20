@@ -211,7 +211,8 @@ public class Main {
 		instructionsEditorPane.setEditorKit(kit);
 		InputStream instructionsInputStream = Main.class.getResourceAsStream("instructions.html");
 		try {
-			byte[] bytes = instructionsInputStream.readAllBytes();
+			byte[] bytes = new byte[16384];
+			instructionsInputStream.read(bytes);
 			String text = new String(bytes);
 			Document doc = kit.createDefaultDocument();
 			instructionsEditorPane.setDocument(doc);
@@ -567,12 +568,23 @@ public class Main {
 				board.add(boardTiles[r][c]);
 			}
 		}
+		Font tempFont = Tile.activeFont;
+		Tile.setActiveFont(newSize);
+		if(tempFont != Tile.activeFont)
+			updateTileFonts(newSize);
 		knightLoc[0] = knightLoc[1] = 0;
 		updateKnightImage(newSize);
 		board.revalidate();
 		board.repaint();
 		boardTiles[0][0].addKnight();
 		
+	}
+	private static void updateTileFonts(int newSize) {
+		for(int x = 0; x < newSize; x++) {
+			for(int y = 0; y < newSize; y++) {
+				boardTiles[x][y].text.setFont(Tile.activeFont);
+			}
+		}
 	}
 	
 	private static void updateKnightImage(int desiredBoardSize) {
@@ -646,12 +658,18 @@ public class Main {
 	}
 	@SuppressWarnings("serial")
 	private static class Tile extends JPanel {
-		
 		private static final Color DARK_COLOR = new Color(184, 255, 168);
 		private static final Color LIGHT_COLOR = new Color(255, 254, 217);
 		private static final Color DARK_DISABLED_COLOR = new Color(69, 69, 69);
 		private static final Color LIGHT_DISABLED_COLOR = new Color(112, 112, 112);
-		private static final Font textFont = new Font("Courier New Bold", Font.PLAIN, 36);
+		private static final Font[] textFonts = 
+				new Font[] {
+						new Font("Courier New Bold", Font.PLAIN, 36),
+						new Font("Courier New Bold", Font.PLAIN, 30),
+						new Font("Courier New Bold", Font.PLAIN, 24)
+				};
+				
+		private static Font activeFont = textFonts[0];
 		private static MouseListener mouseListener = new MouseListener() {
 
 			@Override
@@ -718,11 +736,13 @@ public class Main {
 			public void mouseExited(MouseEvent e) {}
 			
 		};
-		private JLabel img, text;
+		private JLabel img;
+		private JLabel text;
 		private int x, y;
 		private boolean disabled;
 		
 		public Tile(int x, int y) {
+			
 			this.x = x;
 			this.y = y;
 			disabled = false;
@@ -730,7 +750,7 @@ public class Main {
 			text = new JLabel();
 			text.setAlignmentX(0.5f);
 			text.setAlignmentY(0.5f);
-			text.setFont(textFont);
+			text.setFont(activeFont);
 			text.setVisible(true);
 			this.add(text);
 			this.setLayout(new OverlayLayout(this));
@@ -764,6 +784,17 @@ public class Main {
 			this.repaint();
 		}
 		
+		public static void setActiveFont(int boardSize) {
+			if(boardSize >= 23) {
+				activeFont = textFonts[2];
+			}
+			else if(boardSize >= 18) {
+				activeFont = textFonts[1];
+			}
+			else {
+				activeFont = textFonts[0];
+			}
+		}
 		public void setEnabled(boolean newStatus) {
 			newStatus = !newStatus;
 			if(newStatus != disabled) {
