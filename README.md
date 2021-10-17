@@ -1,5 +1,5 @@
 # KnightL
-KnightL is an app that calculates move paths for a knight on a chessboard. More detailed information and instructions can be found on the "Releases" page, but this document shows some pictures of the app.
+KnightL is an app that calculates the shortest path for a knight to get from one square to another on a chessboard. More detailed information and instructions can be found on the "Releases" page, but this document shows some pictures of the app.
 
 ![Basic1](https://user-images.githubusercontent.com/60260374/137632452-8a5310f9-d200-40d6-9366-343ea60452a2.PNG)
 The knight will find a shortest path to any tile you click on and number the steps to get there. The knight starts in the top-left corner, but you can move him my middle-clicking a new start tile.
